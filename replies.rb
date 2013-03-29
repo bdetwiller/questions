@@ -46,12 +46,4 @@ class Reply
     end
   end
 
-  # def save()
-#     query = <<-SQL
-#       INSERT INTO question_replies
-#         ('body', 'question_id', 'parent_id')
-#         VALUES (?,?,?)
-#     SQL
-#     QuestionsDatabase.instance.execute(query, @body, @question, @parent_id)
-#   end
 end
