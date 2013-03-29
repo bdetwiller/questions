@@ -88,6 +88,8 @@ class Question
   end
 
   def self.most_liked(number)
+    #REV: You could use the SQL statement LIMIT that only pulls the first X records instead of pulling them all
+    #And then selecting which ones you want.
     query = <<-SQL
       SELECT *, COUNT(*) AS Likes
         FROM questions JOIN question_likes
@@ -117,7 +119,7 @@ class Question
 
   def num_likes
     query = <<-SQL
-      SELECT COUNT(*)
+      SELECT COUNT(*) #REV: You could use AS here so that you don't have to refer to it as COUNT(*)
         FROM questions JOIN question_likes
         ON (questions.id = question_likes.question_id)
         WHERE questions.id = ?

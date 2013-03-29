@@ -90,6 +90,7 @@ class User
   end
 
   def average_karma
+    #REV: Nie use of RUby to get things done.
     questions = asked_questions
     questions.inject(0) {|total, question| total += question.num_likes} / questions.count
   end
