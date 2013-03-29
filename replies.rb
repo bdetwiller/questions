@@ -40,9 +40,26 @@ class Reply
         WHERE parent_id = ?
     SQL
 
-    hashes = QuestionsDatabase.instance.execute(query, @id)
-    hashes.map do |attributes|
-      Reply.new(attributes)
+    replies = QuestionsDatabase.instance.execute(query, @id)
+    replies.map { |attributes| Reply.new(attributes)}
+    end
+  end
+  
+  def save
+    if @id.nil?
+      query = <<-SQL
+        INSERT INTO question_replies
+          ('body', 'question_id', 'parent_id', 'author_id')
+          VALUES (?, ?, ?)
+      SQL
+      QuestionsDatabase.instance.execute(query, @body, @question_id, @parent_id, @author_id)
+    else
+      query = <<-SQL
+        UPDATE question_replies
+        SET 'body'3
+        WHERE id = ?
+      SQL
+      QuestionsDatabase.instance.execute(query, @body, @id)
     end
   end
 

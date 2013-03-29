@@ -16,6 +16,7 @@ class Question
         FROM questions
         WHERE title = ? AND author_id = ?
     SQL
+    
     attributes = QuestionsDatabase.instance.execute(query, title, author_id)[0]
     Question.new(attributes)
   end
@@ -25,10 +26,9 @@ class Question
       SELECT *
         FROM questions
     SQL
-    hashes = QuestionsDatabase.instance.execute(query)
-
-    hashes.map do |attributes|
-      Question.new(attributes)
+    
+    questions = QuestionsDatabase.instance.execute(query)
+    questions.map { |attributes| Question.new(attributes) }
     end
   end
 
@@ -38,6 +38,7 @@ class Question
         FROM questions
         WHERE id = ?
     SQL
+    
     attributes = QuestionsDatabase.instance.execute(query, id)[0]
     Question.new(attributes)
   end
@@ -47,13 +48,13 @@ class Question
       query = <<-SQL
         INSERT INTO questions
           ('title', 'body', 'author_id')
-          VALUES (?,?,?)
+          VALUES (?, ?, ?)
       SQL
       QuestionsDatabase.instance.execute(query, @title, @body, @author_id)
     else
       query = <<-SQL
         UPDATE questions
-        SET 'title'=?, 'body'=?
+        SET 'title'= ?, 'body'= ?
         WHERE id = ?
       SQL
       QuestionsDatabase.instance.execute(query, @title, @body, @id)
@@ -68,7 +69,6 @@ class Question
     SQL
 
     attributes = QuestionsDatabase.instance.execute(query, @id)[0]
-
     User.new(attributes)
   end
 
@@ -79,11 +79,11 @@ class Question
         ON (questions.id = questions_followers.question_id)
         GROUP BY question_id
         ORDER BY COUNT(*) DESC
+        LIMIT ?
     SQL
-    hashes = QuestionsDatabase.instance.execute(query)
-
-    hashes[0..number].map do |attributes|
-      Question.new(attributes)
+    
+    questions = QuestionsDatabase.instance.execute(query, number)
+    questions.map { |attributes| Question.new(attributes) }
     end
   end
 
@@ -94,11 +94,11 @@ class Question
         ON (questions.id = question_likes.question_id)
         GROUP BY question_id
         ORDER BY COUNT(*) DESC
+        LIMIT ?
     SQL
-    hashes = QuestionsDatabase.instance.execute(query)
-
-    hashes[0..number].map do |attributes|
-      Question.new(attributes)
+    
+    questions = QuestionsDatabase.instance.execute(query, number)
+    questions.map { |attributes| Question.new(attributes) }
     end
   end
 
@@ -109,20 +109,19 @@ class Question
         WHERE questions.id = ?
     SQL
 
-    hashes = QuestionsDatabase.instance.execute(query, @id)
-    hashes.map do |attributes|
-      User.new(attributes)
+    users = QuestionsDatabase.instance.execute(query, @id)
+    users.map { |attributes| User.new(attributes) }
     end
   end
 
   def num_likes
     query = <<-SQL
-      SELECT COUNT(*)
+      SELECT COUNT(*) AS Likes
         FROM questions JOIN question_likes
         ON (questions.id = question_likes.question_id)
         WHERE questions.id = ?
     SQL
-    QuestionsDatabase.instance.execute(query, @id)[0]["COUNT(*)"]
+    QuestionsDatabase.instance.execute(query, @id)[0]["Likes"]
   end
 
 end

@@ -16,6 +16,7 @@ class User
         FROM users
         WHERE fname = ? AND lname = ?
     SQL
+    
     attributes = QuestionsDatabase.instance.execute(query, first_name, last_name)[0]
     User.new(attributes)
   end
@@ -26,6 +27,7 @@ class User
         FROM users
         WHERE id = ?
     SQL
+    
     attributes = QuestionsDatabase.instance.execute(query, id)[0]
     User.new(attributes)
   end
@@ -35,11 +37,9 @@ class User
       SELECT *
         FROM users
     SQL
-    hashes = QuestionsDatabase.instance.execute(query)
-
-    hashes.map do |attributes|
-      User.new(attributes)
-    end
+    
+    users = QuestionsDatabase.instance.execute(query)
+    users.map { |attributes| User.new(attributes) }
   end
 
   def save
@@ -49,6 +49,7 @@ class User
           ('fname', 'lname', 'is_instructor')
           VALUES (?,?,?)
       SQL
+      
       QuestionsDatabase.instance.execute(query, @fname, @lname, @is_instructor)
     else
       query = <<-SQL
@@ -56,6 +57,7 @@ class User
         SET 'fname'=?, 'lname'=?, 'is_instructor'=?
         WHERE id = ?
       SQL
+      
       QuestionsDatabase.instance.execute(query, @fname, @lname, @is_instructor, @id)
     end
 
@@ -68,11 +70,8 @@ class User
         WHERE users.id = ?
     SQL
 
-    hashes = QuestionsDatabase.instance.execute(query, @id)
-
-    hashes.map do |attributes|
-      Question.new(attributes)
-    end
+    questions = QuestionsDatabase.instance.execute(query, @id)
+    questions.map { |attributes| Question.new(attributes) }
   end
 
   def replies
@@ -82,10 +81,8 @@ class User
         WHERE users.id = ?
     SQL
 
-    hashes = QuestionsDatabase.instance.execute(query, @id)
-
-    hashes.map do |attributes|
-      Reply.new(attributes)
+    replies = QuestionsDatabase.instance.execute(query, @id)
+    replies.map { |attributes| Reply.new(attributes) }
     end
   end
 
