@@ -2,6 +2,7 @@ CREATE TABLE users (
   id INTEGER PRIMARY KEY,
   fname VARCHAR(255) NOT NULL,
   lname VARCHAR(255) NOT NULL,
+	#REV: maybe restrict to 0 or 1 with: CHECK (is_instructor IN ('0', '1'))
   is_instructor INTEGER
 );
 

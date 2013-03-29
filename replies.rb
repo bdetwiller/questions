@@ -23,6 +23,7 @@ class Reply
 
   def self.most_replied
     query = <<-SQL
+    #REV: don't really need COUNT(*) here, just down below
       SELECT a.id, a.body, a.question_id, a.parent_id, a.author_id COUNT(*) AS num_replies
         FROM question_replies a JOIN question_replies b
         ON (a.id = b.parent_id)

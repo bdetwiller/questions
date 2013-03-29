@@ -26,7 +26,7 @@ class Question
         FROM questions
     SQL
     hashes = QuestionsDatabase.instance.execute(query)
-
+    #REV: very nice way to translate the hashes array into question objects
     hashes.map do |attributes|
       Question.new(attributes)
     end
@@ -79,9 +79,10 @@ class Question
         ON (questions.id = questions_followers.question_id)
         GROUP BY question_id
         ORDER BY COUNT(*) DESC
+        #REV: just put `LIMIT ?` and number down in #execute
     SQL
     hashes = QuestionsDatabase.instance.execute(query)
-
+    #REV: then you don't need [0..number]
     hashes[0..number].map do |attributes|
       Question.new(attributes)
     end
