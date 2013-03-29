@@ -43,12 +43,22 @@ class User
   end
 
   def save
-    query = <<-SQL
-      INSERT INTO users
-        ('fname', 'lname', 'is_instructor')
-        VALUES (?,?,?)
-    SQL
-    QuestionsDatabase.instance.execute(query, @fname, @lname, @is_instructor)
+    if @id.nil?
+      query = <<-SQL
+        INSERT INTO users
+          ('fname', 'lname', 'is_instructor')
+          VALUES (?,?,?)
+      SQL
+      QuestionsDatabase.instance.execute(query, @fname, @lname, @is_instructor)
+    else
+      query = <<-SQL
+        UPDATE users
+        SET 'fname'=?, 'lname'=?, 'is_instructor'=?
+        WHERE id = ?
+      SQL
+      QuestionsDatabase.instance.execute(query, @fname, @lname, @is_instructor, @id)
+    end
+
   end
 
   def asked_questions
@@ -58,11 +68,30 @@ class User
         WHERE users.id = ?
     SQL
 
-    p hashes = QuestionsDatabase.instance.execute(query, @id)
+    hashes = QuestionsDatabase.instance.execute(query, @id)
 
     hashes.map do |attributes|
       Question.new(attributes)
     end
+  end
+
+  def replies
+    query = <<-SQL
+      SELECT question_replies.id, body, question_id, parent_id, author_id
+        FROM users JOIN question_replies ON (users.id = author_id)
+        WHERE users.id = ?
+    SQL
+
+    hashes = QuestionsDatabase.instance.execute(query, @id)
+
+    hashes.map do |attributes|
+      Reply.new(attributes)
+    end
+  end
+
+  def average_karma
+    questions = asked_questions
+    questions.inject(0) {|total, question| total += question.num_likes} / questions.count
   end
 
 end

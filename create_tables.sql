@@ -22,7 +22,8 @@ CREATE TABLE question_replies (
   id INTEGER PRIMARY KEY,
   body TEXT NOT NULL,
   question_id INTEGER NOT NULL,
-  parent_id INTEGER NOT NULL
+  parent_id INTEGER,
+  author_id VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE question_actions (
@@ -58,8 +59,9 @@ VALUES (1,1), (1,2), (2,2), (3,2), (4,2);
 INSERT INTO question_likes ('user_id','question_id')
 VALUES (1,1), (1,2), (2,2), (3,2), (4,2);
 
--- INSERT INTO question_replies ('body','question_id','parent_id')
--- VALUES ('Why', 'First question reply for one',1),
--- ('First question reply for two',2),
--- ('Second question reply for two',2);
+INSERT INTO question_replies ('body','question_id','parent_id', 'author_id')
+VALUES ('First question reply for one', 1, NULL, 1),
+('First question reply for two', 2, NULL, 1),
+('Second question reply for two', 2, 2, 1),
+('Thrid question reply for two', 2, 2, 1);
 

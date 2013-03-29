@@ -43,12 +43,21 @@ class Question
   end
 
   def save
-    query = <<-SQL
-      INSERT INTO q
-        ('title', 'body', 'author_id')
-        VALUES (?,?,?)
-    SQL
-    QuestionsDatabase.instance.execute(query, @title, @body, @author_id)
+    if @id.nil?
+      query = <<-SQL
+        INSERT INTO questions
+          ('title', 'body', 'author_id')
+          VALUES (?,?,?)
+      SQL
+      QuestionsDatabase.instance.execute(query, @title, @body, @author_id)
+    else
+      query = <<-SQL
+        UPDATE questions
+        SET 'title'=?, 'body'=?
+        WHERE id = ?
+      SQL
+      QuestionsDatabase.instance.execute(query, @title, @body, @id)
+    end
   end
 
   def asking_student
@@ -71,11 +80,49 @@ class Question
         GROUP BY question_id
         ORDER BY COUNT(*) DESC
     SQL
-    p hashes = QuestionsDatabase.instance.execute(query)
+    hashes = QuestionsDatabase.instance.execute(query)
 
     hashes[0..number].map do |attributes|
       Question.new(attributes)
     end
+  end
+
+  def self.most_liked(number)
+    query = <<-SQL
+      SELECT *, COUNT(*) AS Likes
+        FROM questions JOIN question_likes
+        ON (questions.id = question_likes.question_id)
+        GROUP BY question_id
+        ORDER BY COUNT(*) DESC
+    SQL
+    hashes = QuestionsDatabase.instance.execute(query)
+
+    hashes[0..number].map do |attributes|
+      Question.new(attributes)
+    end
+  end
+
+  def followers
+    query = <<-SQL
+      SELECT fname, lname, users.id
+        FROM users JOIN questions ON (users.id = questions.author_id)
+        WHERE questions.id = ?
+    SQL
+
+    hashes = QuestionsDatabase.instance.execute(query, @id)
+    hashes.map do |attributes|
+      User.new(attributes)
+    end
+  end
+
+  def num_likes
+    query = <<-SQL
+      SELECT COUNT(*)
+        FROM questions JOIN question_likes
+        ON (questions.id = question_likes.question_id)
+        WHERE questions.id = ?
+    SQL
+    QuestionsDatabase.instance.execute(query, @id)[0]["COUNT(*)"]
   end
 
 end
